@@ -44,12 +44,22 @@ pipeline {
         }
 
         stage('Update Kubernetes YAML') {
-        steps {
-        script {
-            sh "sed -i '' 's/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:v2/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:${IMAGE_TAG}/' kubernetes.yaml"
-             }
-           }
-       }
+            steps {
+                script {
+                    // Update Kubernetes YAML with the new image tag
+                    sh "sed -i '' 's/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:v2/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:${IMAGE_TAG}/' kubernetes.yaml"
+                    
+                    // Commit and push the updated Kubernetes YAML file to GitHub
+                    gitAdd = sh(script: 'git add kubernetes.yaml', returnStatus: true)
+                    if (gitAdd == 0) {
+                        sh 'git commit -m "Update kubernetes.yaml with new image tag"'
+                        sh 'git push origin master'
+                    } else {
+                        error('Failed to stage changes. Aborting the pipeline.')
+                    }
+                }
+            }
+        }
 
 
         stage('Deploy to Kubernetes') {
