@@ -1,54 +1,57 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag')
-    }
-
-    environment {
-        AWS_REGION = 'us-east-1'
-        AWS_ACCOUNT_ID = '183991395055'
-        ECR_REPOSITORY = 'hello-repository'
-        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-    }
-
     stages {
         stage('Checkout') {
             steps {
+                // Checkout the source code from the Git repository
                 git 'https://github.com/mansuralamkhan/nodejs.git'
             }
         }
-        
+
+        stage('Install Dependencies') {
+            steps {
+                // Install Node.js dependencies
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Run tests if available
+                sh 'npm test'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    dockerImage = docker.build("${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}")
-                }
+                // Build Docker image
+                sh 'docker build -t nodejs-app .'
             }
         }
 
-        stage('Login to AWS ECR') {
+        stage('Push to Docker Registry') {
             steps {
-                script {
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
-                }
+                // Push Docker image to Docker registry (e.g., Docker Hub, AWS ECR)
+                sh 'docker tag nodejs-app mansuralam44/nodejs-app:latest'
+                sh 'docker push mansuralam44/nodejs-app:latest'
             }
         }
 
-        stage('Push to AWS ECR') {
+        stage('Deploy') {
             steps {
-                script {
-                    dockerImage.push()
-                }
+                // Deploy the application (e.g., using Kubernetes)
+                // This stage assumes you have Kubernetes configured in Jenkins
+                // Replace 'kubectl' with the appropriate command for your deployment setup
+                sh 'kubectl apply -f kubernetes.yaml'
             }
         }
     }
 
     post {
         always {
-            script {
-                sh "docker rmi ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
-            }
+            // Clean up after the pipeline execution
+            cleanWs()
         }
     }
 }
