@@ -46,17 +46,16 @@ pipeline {
         stage('Update Kubernetes YAML') {
             steps {
                 script {
+                    // Fetch the current image tag from the kubernetes.yaml file
+                    def oldTag = sh(script: "grep -oP '(?<=image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:)\\S+' kubernetes.yaml", returnStdout: true).trim()
+
                     // Update Kubernetes YAML with the new image tag
-                    sh "sed -i '' 's/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:v2/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:${IMAGE_TAG}/' kubernetes.yaml"
-                    
+                    sh "sed -i '' 's/${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com\\/hello-repository:${oldTag}/${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com\\/hello-repository:${params.IMAGE_TAG}/' kubernetes.yaml"
+
                     // Commit and push the updated Kubernetes YAML file to GitHub
-                    gitAdd = sh(script: 'git add kubernetes.yaml', returnStatus: true)
-                    if (gitAdd == 0) {
-                        sh 'git commit -m "Update kubernetes.yaml with new image tag"'
-                        sh 'git push origin master'
-                    } else {
-                        error('Failed to stage changes. Aborting the pipeline.')
-                    }
+                    sh 'git add kubernetes.yaml'
+                    sh 'git commit -m "Update kubernetes.yaml with new image tag ${params.IMAGE_TAG}"'
+                    sh 'git push origin master'
                 }
             }
         }
