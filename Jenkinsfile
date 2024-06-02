@@ -44,13 +44,13 @@ pipeline {
         }
 
         stage('Update Kubernetes YAML') {
-            steps {
-                // Update Kubernetes YAML with the new image tag
-                script {
-                    sh "sed -i 's/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:v2/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:${IMAGE_TAG}/' kubernetes.yaml"
-                }
-            }
-        }
+        steps {
+        script {
+            sh "sed -i '' 's/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:v2/image: 183991395055.dkr.ecr.us-east-1.amazonaws.com\\/hello-repository:${IMAGE_TAG}/' kubernetes.yaml"
+             }
+           }
+       }
+
 
         stage('Deploy to Kubernetes') {
             steps {
