@@ -55,7 +55,7 @@ pipeline {
                     // Commit and push the updated Kubernetes YAML file to GitHub
                     sh 'git add kubernetes.yaml'
                     sh "git commit -m 'Update kubernetes.yaml with new image tag ${params.IMAGE_TAG}'"
-                    sh 'git push origin main'
+                    sh 'git push origin master'
                 }
             }
         }
