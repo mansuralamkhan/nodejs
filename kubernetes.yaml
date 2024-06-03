@@ -19,7 +19,7 @@ spec:
         - name: ecr-secret
       containers:
         - name: nodejs-app
-          image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:six
+          image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:nine
           ports:
             - containerPort: 3000
           env:
