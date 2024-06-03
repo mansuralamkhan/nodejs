@@ -22,7 +22,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}")
+                    // dockerImage = docker.build("${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}")
+                                        sh 'docker build -t 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:latestt .'
+
                 }
             }
         }
