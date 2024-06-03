@@ -16,10 +16,10 @@ spec:
         app: nodejs-app
     spec:
       imagePullSecrets:
-        - name: ecr-registry-secret
+        - name: ecr-secret
       containers:
         - name: nodejs-app
-          image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:five
+          image: 183991395055.dkr.ecr.us-east-1.amazonaws.com/hello-repository:six
           ports:
             - containerPort: 3000
           env:
